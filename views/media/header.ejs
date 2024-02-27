@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard Admin Kasir Minimarket</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      .container {
+        margin-top: 60px; /* Atur margin top ke 50px */
+      }
+      /* Menambahkan gaya untuk membuat tabel dapat di-scroll */
+      .table-wrapper-scroll-y {
+        display: block;
+        max-height: 400px; /* Atur ketinggian maksimum tabel di sini */
+        overflow-y: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-3">
+          <label for="label"><h1 id="current-time"></h1></label>
+          <div class="list-group mt-3">
+            <h4>Menu :</h4>
+            <a href="/dashboard" class="list-group-item list-group-item-action"
+              >Dashboard</a
+            >
+            <a href="/produk" class="list-group-item list-group-item-action"
+              >Products</a
+            >
+            <a href="/pengguna" class="list-group-item list-group-item-action"
+              >User</a
+            >
+            <a href="/laporan" class="list-group-item list-group-item-action"
+              >Report Profit</a
+            >
+          </div>
+          <button class="btn btn-danger mt-2" onclick="window.location.href='/'">logout</button>
+        </div>

@@ -1,0 +1,81 @@
+<%- include('../media/header') %>
+<div class="col-md-9">
+    <h1>Pengguna List</h1>
+    <div class="mt-2 mb-1">
+      <a href="/add/pengguna" class="btn btn-success">Tambah</a>
+        <button
+          type="button"
+          class="btn btn-primary"
+          data-toggle="modal"
+          data-target="#exampleModal"
+        >
+          Import Data Excel
+        </button>
+    </div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>No</th>
+          <th>Nama</th>
+          <th>Kata Sandi</th>
+          <th>Peran</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% var nomor = 0;
+        pengguna.forEach(pengguna => { %>
+          <tr>
+            <td><%= ++nomor %></td>
+            <td><%= pengguna.nama_pengguna %></td>
+            <td><%= pengguna.kata_sandi %></td>
+            <td><%= pengguna.peran %></td>
+            <td>
+              <a href="/edit/pengguna/<%= pengguna.id_pengguna %>" class="btn btn-success">Edit</a>
+              <a href="/delete/pengguna/<%= pengguna.id_pengguna %>" class="btn btn-danger">Hapus</a>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+    <!-- Modal -->
+    <div
+      class="modal fade"
+      id="exampleModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form action="/import/pengguna" method="post" enctype="multipart/form-data">
+              <div class="form-group">
+                <label for="excelFile">Pilih File Excel (.xls):</label><br />
+                <input type="file" name="file" />
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  data-dismiss="modal"
+                >
+                  Close
+                </button>
+                <button type="submit" class="btn btn-primary">Import</button>
+              </div>
+            </form>
+          </div>
+    <%- include('../media/footer') %>

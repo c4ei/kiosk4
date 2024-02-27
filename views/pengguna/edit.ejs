@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Pengguna</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+  <div class="container mt-5"><!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Edit Pengguna</title>
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    </head>
+    <body>
+      <div class="container mt-5">
+        <h1>Edit Pengguna</h1>
+        <form action="/edit/pengguna/<%= pengguna.id_pengguna %>" method="post">
+          <div class="form-group">
+            <label for="nama_pengguna">Nama Pengguna:</label>
+            <input type="text" class="form-control" id="nama_pengguna" name="nama_pengguna" value="<%= pengguna ? pengguna.nama_pengguna : '' %>" required>
+          </div>
+          <div class="form-group">
+            <label for="kata_sandi">Kata Sandi:</label>
+            <input type="password" class="form-control" id="kata_sandi" name="kata_sandi" value="<%= pengguna ? pengguna.kata_sandi : '' %>" required>
+          </div>
+          <div class="form-group">
+            <label for="peran">Peran:</label>
+            <select class="form-control" id="peran" name="peran" required>
+              <option value="admin" <% if (pengguna && pengguna.peran === 'admin') { %> selected <% } %>>Admin</option>
+              <option value="kasir" <% if (pengguna && pengguna.peran === 'kasir') { %> selected <% } %>>Kasir</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+      </div>
+    </body>
+    </html>

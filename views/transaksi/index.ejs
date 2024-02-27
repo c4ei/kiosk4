@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Transaksi Kasir</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+  </head>
+  <body>
+    <div class="container mt-5">
+      <h1>Transaksi Kasir</h1>
+      <div class="d-flex justify-content-end align-items-center">
+        <!-- Tampilkan nama pengguna -->
+        <h3 class="mr-3">
+          Selamat datang,
+          <span id="namaPengguna"><%= username %></span>!
+        </h3>
+        <!-- Tombol logout -->
+        <button
+          type="button"
+          class="btn btn-danger"
+          onclick="window.location.href='/'"
+        >
+          Logout
+        </button>
+      </div>
+      <form id="barcodeForm">
+        <div class="form-group">
+          <label for="barcodeInput">Barcode:</label>
+          <input
+            type="text"
+            class="form-control"
+            id="barcodeInput"
+            placeholder="Masukkan barcode produk"
+          />
+        </div>
+      </form>
+      <hr />
+      <h2>Produk</h2>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Nama Produk</th>
+            <th>Harga</th>
+            <th>Qty</th>
+            <th>Total Harga</th>
+          </tr>
+        </thead>
+        <tbody id="produkList">
+          <!-- Produk akan ditambahkan di sini -->
+        </tbody>
+      </table>
+      <div class="form-group">
+        <label for="metodePembayaran">Metode Pembayaran:</label>
+        <select class="form-control" id="metodePembayaran">
+          <option value="tunai">Tunai</option>
+          <option value="debit">Debit</option>
+          <option value="kredit">Kredit</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="jumlahBayar">Jumlah Bayar:</label>
+        <input
+          type="number"
+          class="form-control"
+          id="jumlahBayar"
+          placeholder="Masukkan jumlah bayar"
+        />
+      </div>
+      <button type="button" class="btn btn-primary" onclick="hitungKembalian()">
+        Hitung Kembalian
+      </button>
+      <h3>Total Harga Belanja: <span id="totalHarga">0</span></h3>
+      <h3>Jumlah Bayar: <span id="jumlahBayarDisplay">0</span></h3>
+      <h3>Kembalian: <span id="kembalianDisplay">0</span></h3>
+      <button type="button" class="btn btn-success" onclick="cetakStruk()">
+        Cetak Struk
+      </button>
+    </div>
+
+    <script>
+      document
+        .getElementById("barcodeInput")
+        .addEventListener("keypress", function (event) {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            var barcode = this.value.trim();
+            if (barcode !== "") {
+              // Kirim barcode ke server dan dapatkan detail produk
+              fetch("/produk/" + barcode)
+                .then((response) => response.json())
+                .then((data) => {
+                  if (data) {
+                    // Jika produk ditemukan, tambahkan ke tabel produk
+                    var nomor =
+                      document.querySelectorAll("#produkList tr").length + 1;
+                    var row = `
+                  <tr id="row${nomor}">
+                    <td>${nomor}</td>
+                    <td>${data.nama_produk}</td>
+                    <td>${data.harga_jual}</td>
+                    <td><input type="number" class="form-control" id="qty${nomor}" onchange="calculateTotal(${data.harga_jual}, ${nomor})"></td>
+                    <td id="totalHarga${nomor}">0</td>
+                    <td><button type="button" class="btn btn-danger" onclick="hapusProduk(${nomor})">Hapus</button></td>
+                  </tr>
+                `;
+                    document
+                      .getElementById("produkList")
+                      .insertAdjacentHTML("beforeend", row);
+
+                    // Hitung total harga belanja
+                    calculateTotalBelanja();
+
+                    // Bersihkan input barcode
+                    document.getElementById("barcodeInput").value = "";
+                  } else {
+                    alert("Produk tidak ditemukan!");
+                  }
+                })
+                .catch((error) => {
+                  console.error("Error:", error);
+                });
+            }
+          }
+        });
+
+      function hapusProduk(nomor) {
+        var row = document.getElementById(`row${nomor}`);
+        row.parentNode.removeChild(row);
+        calculateTotalBelanja();
+      }
+
+      function calculateTotal(harga, nomor) {
+        var qty = document.getElementById(`qty${nomor}`).value;
+        var total = harga * qty;
+        document.getElementById(`totalHarga${nomor}`).textContent = total;
+        calculateTotalBelanja();
+      }
+
+      function calculateTotalBelanja() {
+        var totalHargaBelanja = 0;
+        var rows = document.querySelectorAll("#produkList tr");
+        rows.forEach((row) => {
+          var nomor = row.id.replace("row", "");
+          var totalHarga = parseFloat(
+            document.getElementById(`totalHarga${nomor}`).textContent
+          );
+          totalHargaBelanja += totalHarga;
+        });
+        document.getElementById("totalHarga").textContent = totalHargaBelanja;
+      }
+
+      function hitungKembalian() {
+        var totalHarga = parseFloat(
+          document.getElementById("totalHarga").textContent
+        );
+        var jumlahBayar = parseFloat(
+          document.getElementById("jumlahBayar").value
+        );
+        var kembalian = jumlahBayar - totalHarga;
+        document.getElementById("jumlahBayarDisplay").textContent = jumlahBayar;
+        document.getElementById("kembalianDisplay").textContent = kembalian;
+      }
+
+      async function cetakStruk() {
+        // Mendapatkan data transaksi
+        var totalHarga = parseFloat(
+          document.getElementById("totalHarga").textContent
+        );
+        var jumlahBayar = parseFloat(
+          document.getElementById("jumlahBayar").value
+        );
+        var kembalian = parseFloat(
+          document.getElementById("kembalianDisplay").textContent
+        );
+
+        // Periksa apakah jumlah bayar telah diisi
+        if (isNaN(jumlahBayar) || jumlahBayar <= 0) {
+          alert("Masukkan jumlah bayar yang valid!");
+          return;
+        }
+
+        // Membuat struk
+        var struk = `
+Kunci Mart
+Jl.Suka-Suka No.6 Majapahit 30012
+----------------------------
+no.faktur:                     kasir: khoirotun
+----------------------------
+`;
+
+        // Mendapatkan semua baris produk
+        var rows = document.querySelectorAll("#produkList tr");
+        rows.forEach((row) => {
+          var nomor = row.id.replace("row", "");
+          var namaProduk = row.querySelector(
+            `#row${nomor} td:nth-child(2)`
+          ).textContent;
+          var hargaSatuan = row.querySelector(
+            `#row${nomor} td:nth-child(3)`
+          ).textContent;
+          var qty = row.querySelector(`#qty${nomor}`).value;
+          var totalHargaProduk = row.querySelector(
+            `#totalHarga${nomor}`
+          ).textContent;
+
+          // Menambahkan detail produk ke struk
+          struk += `
+  ${namaProduk}   
+  Rp ${hargaSatuan} X ${qty}                   Rp ${totalHargaProduk}
+`;
+        });
+
+        // Menambahkan total harga, jumlah bayar, dan kembalian ke struk
+        struk += `
+----------------------------
+Total Harga:                  Rp ${totalHarga}
+Jumlah Bayar:                 Rp ${jumlahBayar}
+Kembalian:                    Rp ${kembalian}
+----------------------------
+Terimakasih Telah Belanja di KunciMart
+Belanja Cepat dan Hemat Cuman di KunciMart!!
+`;
+
+        // Mencetak struk ke konsol
+        console.log(struk);
+
+        // Kirim data transaksi ke server
+        try {
+          const response = await fetch("/simpan-transaksi", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              totalHarga: totalHarga,
+              jumlahBayar: jumlahBayar,
+              kembalian: kembalian,
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error("Gagal menyimpan transaksi.");
+          }
+
+          console.log("Transaksi berhasil disimpan ke database.");
+        } catch (error) {
+          console.error("Gagal menyimpan transaksi:", error);
+        }
+      }
+    </script>
+  </body>
+</html>
